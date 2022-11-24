@@ -83,5 +83,5 @@ class Variacao(models.Model):
 
 
     class Meta:
-        verbose_name = 'Variação'
-        verbose_name_plural = 'Variações'
+        verbose_name = 'Variacao'
+        verbose_name_plural = 'Variacoes'

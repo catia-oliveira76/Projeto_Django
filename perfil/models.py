@@ -7,10 +7,10 @@ from utils.validacpf import valida_cpf
 
 
 class Perfil(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    email = models.CharField(max_length=255)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE,
+                                   verbose_name='Usuário')
     data_nascimento = models.DateField()
-    CPF = models.CharField(max_length=11)
+    cpf = models.CharField(max_length=11)
     endereco = models.CharField(max_length=50)
     numero = models.CharField(max_length=5)
     complemento = models.CharField(max_length=30)
@@ -48,25 +48,33 @@ class Perfil(models.Model):
             ('SP', 'São Paulo'),
             ('SE', 'Sergipe'),
             ('TO', 'Tocantins'),
-            )
         )
+    )
 
     def __str__(self):
-        return f'{self.usuario.first_name} {self.usuario.last_name}'
+        return f'{self.usuario}'
 
     def clean(self):
         error_messages = {}
 
-        if not valida_cpf(self.CPF):
-            error_messages['CPF'] = 'Digite um CPF válido'
+        cpf_enviado = self.cpf or None
+        cpf_salvo = None
+        perfil = Perfil.objects.filter(cpf=cpf_enviado).first()
 
-        if re.search(r'[^0-9]', self.cep) or len (self.cep) <8:
-            error_messages['cep'] = 'CEP inválido'
+        if perfil:
+            cpf_salvo = perfil.cpf
+
+            if cpf_salvo is not None and self.pk != perfil.pk:
+                error_messages['cpf'] = 'CPF já existe.'
+
+        if not valida_cpf(self.cpf):
+            error_messages['cpf'] = 'Digite um CPF válido'
+
+        if re.search(r'[^0-9]', self.cep) or len(self.cep) < 8:
+            error_messages['cep'] = 'CEP inválido, digite os 8 digitos do CEP.'
 
         if error_messages:
             raise ValidationError(error_messages)
-
-
 
     class Meta:
         verbose_name = 'Perfil'
