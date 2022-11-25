@@ -30,8 +30,7 @@ class Busca(ListaProdutos):
 
         qs = qs.filter(
             Q(nome__icontains=termo) |
-            Q(descricao_curta__icontains=termo) |
-            Q(descricao_longa__icontains=termo)
+            Q(autor__icontains=termo) 
         )
 
         self.request.session.save()
